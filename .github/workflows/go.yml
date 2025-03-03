@@ -7,12 +7,11 @@ on:
     branches: [ "aula_5" ]
 
 jobs:
-
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go_version: ['1.20', '1.19', '>=1.20']
+        go_version: ['1.20', '1.19','>=1.20']
     steps:
     - uses: actions/checkout@v4
 
@@ -21,18 +20,19 @@ jobs:
       with:
         go-version: ${{ matrix.go_version }}
     
-    - name: Build-DB
+    - name: Install Docker Compose
       run: |
         sudo apt-get update
-        sudo apt-get install -y docker-compose
-        docker-compose build
+        sudo apt-get install -y docker-compose || sudo apt-get install -y docker-compose-plugin
+    
+    - name: Build-DB
+      run: docker compose build
     
     - name: Create-DB
-      run: docker-compose up -d
+      run: docker compose up -d
   
     - name: Test
       run: go test -v main_test.go
-
 
   build:
     needs: test
